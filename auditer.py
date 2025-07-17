@@ -21,7 +21,7 @@ Perform a code review of the webpage source. If an element is found which is mis
   - **Suggested Change:** line 123
     ```diff
     - <p">Heading title</p>
-    + <h1 bar="Hello world">Heading title</p>
+    + <h1 bar="Hello world">Heading title</h1>
     ```
 </output-example>
 
