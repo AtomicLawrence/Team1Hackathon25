@@ -74,6 +74,7 @@ struct ContentView: View {
         }
     }
     func submit() {
+        response = ""
         guard
             let websiteURL,
             let inspectorURL = URL(string: "http://127.0.0.1:5000/accessibility-improvements/\(websiteURL.absoluteString)")
