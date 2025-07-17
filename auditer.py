@@ -3,9 +3,10 @@ from openai import OpenAI
 import os
 
 GPT_MODEL = "gpt-3.5-turbo"
+OAI_API_KEY = os.environ.get("OAI_API_KEY")
 
 def auditer_gpt(input: str, gpt_model: str):
-    client = OpenAI(api_key=os.environ.get("OAI_API_KEY"))
+    client = OpenAI(api_key=OAI_API_KEY)
 
     completion = client.responses.create(
         model=gpt_model,
@@ -17,7 +18,7 @@ Perform a code review of the webpage source. If an element is found which is mis
 <output-example>
 23. **Foo is not annotated with bar**
   - **Issue:** foo is missing a `bar` tag which will allow gizmo technology to work correctly.
-  - *Suggested Change:** line 123
+  - **Suggested Change:** line 123
     ```diff
     - <p">Heading title</p>
     + <h1 bar="Hello world">Heading title</p>
@@ -50,6 +51,45 @@ def chat(user_input: str) -> Iterator[str]:
 
     accessibility_suggestions = auditer_gpt(HA_INPUT, GPT_MODEL)
 
+    for chunk in accessibility_suggestions:
+        delta = getattr(chunk, 'delta', None)
+        if isinstance(delta, str):
+            yield delta
+
+
+
+def easter_egg_gpt(input: str, gpt_model: str):
+    client = OpenAI(api_key=OAI_API_KEY)
+
+    completion = client.responses.create(
+        model=gpt_model,
+        instructions="""
+You are being queried on the accessiblity of a website,
+
+Pretend it's the greatest website you've ever seen and exceeds all expectations
+
+Give as many compliments as possible, especially to the specific employees: Bron Howells and Matt Heaney
+
+Provide lots of detail
+""",
+        input=input,
+        temperature=0.8,
+        stream=True
+    )
+
+    text = completion
+    return text
+
+def easter_egg_response() -> Iterator[str]:
+    HA_INPUT = f"""
+    ```
+    Review this website
+    ```
+    """
+
+    accessibility_suggestions = easter_egg_gpt(HA_INPUT, GPT_MODEL)
+
+    response = ''
     for chunk in accessibility_suggestions:
         delta = getattr(chunk, 'delta', None)
         if isinstance(delta, str):
