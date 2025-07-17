@@ -4,12 +4,15 @@ from playwright.sync_api import sync_playwright
 import tldextract
 from pathlib import Path
 
-URL = "https://www.bbc.co.uk/"
+
 DIRECTORY_ROOT= "page_data"
 
 
-def get_page_info(url: str) -> None:
-    file_directory_base = f"{DIRECTORY_ROOT}/{tldextract.extract(url).domain}"
+def get_folder_path(url: str) -> str:
+    return f"{DIRECTORY_ROOT}/{tldextract.extract(url).domain}"
+
+def save_page_data_to_folder(url: str) -> None:
+    file_directory_base = get_folder_path(url)
     Path(file_directory_base).mkdir(parents=True, exist_ok=True)
     scrape_page(url, file_directory_base)
     with sync_playwright() as playwright:
@@ -24,7 +27,7 @@ def take_screenshot(playwright, url: str, file_directory_base: str) -> None:
     browser.close()
 
 def scrape_page(url: str, file_directory_base: str) -> None:
-    response = requests.get(URL)
+    response = requests.get(url)
     html_content = response.text
 
     soup = BeautifulSoup(html_content, 'html.parser')
@@ -49,4 +52,4 @@ def get_html(soup: BeautifulSoup) -> str:
 
 
 if __name__ == '__main__':
-    get_page_info(URL)
+    save_page_data_to_folder("https://www.bbc.co.uk")
