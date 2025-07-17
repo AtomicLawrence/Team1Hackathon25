@@ -1,3 +1,4 @@
+from typing import Generator, Iterator
 from openai import OpenAI
 import os
 
@@ -23,7 +24,7 @@ These accessibility needs include support for screen readers (including alt-text
     text = completion
     return text
 
-def chat(user_input: str) -> str:
+def chat(user_input: str) -> Iterator[str]:
     HA_INPUT = f"""
     ```
     {user_input}
@@ -32,7 +33,9 @@ def chat(user_input: str) -> str:
 
     accessibility_suggestions = auditer_gpt(HA_INPUT, GPT_MODEL)
 
-    response = ""
+    response = ''
     for chunk in accessibility_suggestions:
-        response += chunk.choices[0].delta.get("content", "")
-        yield response
+        delta = getattr(chunk, 'delta', None)
+        if isinstance(delta, str):
+            response += delta
+            yield response
