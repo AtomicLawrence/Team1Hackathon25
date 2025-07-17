@@ -12,6 +12,7 @@ struct ContentView: View {
     @State var responseURL = ""
     @State var response = ""
     @State var isLoading = false
+    @State private var task: Task<(), Error>? = nil
     
     var body: some View {
         NavigationStack {
@@ -52,6 +53,7 @@ struct ContentView: View {
                                 Text(responseURL)
                                     .bubble(.leading)
                                 Text(response)
+                                    .textSelection(.enabled)
                                     .bubble(.trailing)
                             } else if isLoading {
                                 Text(responseURL)
@@ -99,6 +101,7 @@ struct ContentView: View {
         }
     }
     func submit() {
+        task?.cancel()
         guard
             let websiteURL,
             let inspectorURL = URL(string: "http://127.0.0.1:5000/accessibility-improvements/\(websiteURL.absoluteString)")
@@ -113,7 +116,7 @@ struct ContentView: View {
         let request = URLRequest(url: inspectorURL)
         let session = URLSession(configuration: .default)
         isLoading = true
-        Task {
+        task = Task {
             defer { isLoading = false }
             let (data, _) = try await session.data(for: request)
             let string = String(data: data, encoding: .utf8)
