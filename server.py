@@ -1,6 +1,7 @@
 from flask import Flask
 from auditer import chat, easter_egg_response
 from scraper import save_page_data_to_folder, get_folder_path
+from request_object import AccessiblityImprovementRequest
 
 DIRECTORY_ROOT= "page_data"
 
@@ -26,8 +27,9 @@ def get_accessiblity_imorovements(url: str):
     
     with open(f"{get_folder_path(url)}/html.txt", 'r') as file:
         data = file.read()
+        screenshot = f"{get_folder_path(url)}/screenshot.png"
 
-        for outputChunk in chat(user_input = data):
+        for outputChunk in chat(user_input = AccessiblityImprovementRequest(data, screenshot)):
            text_response += outputChunk
 
     return text_response
