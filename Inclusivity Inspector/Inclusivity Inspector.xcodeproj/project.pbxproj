@@ -29,22 +29,9 @@
 		1A23DF4B2E293C1400BA7D13 /* Inclusivity InspectorUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Inclusivity InspectorUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		1A804AFB2E294C6B00BAA483 /* Exceptions for "Inclusivity Inspector" folder in "Inclusivity Inspector" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				"Inclusivity-Inspector-Info.plist",
-			);
-			target = 1A23DF322E293C1300BA7D13 /* Inclusivity Inspector */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		1A23DF352E293C1300BA7D13 /* Inclusivity Inspector */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				1A804AFB2E294C6B00BAA483 /* Exceptions for "Inclusivity Inspector" folder in "Inclusivity Inspector" target */,
-			);
 			path = "Inclusivity Inspector";
 			sourceTree = "<group>";
 		};

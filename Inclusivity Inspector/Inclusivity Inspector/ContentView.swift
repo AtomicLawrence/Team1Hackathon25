@@ -9,60 +9,85 @@ import SwiftUI
 
 struct ContentView: View {
     @State var urlString = ""
+    @State var responseURL = ""
     @State var response = ""
     @State var isLoading = false
     
     var body: some View {
-        VStack {
-            ScrollView {
-                Group {
-                    if !response.isEmpty {
-                        Text(response)
-                            .padding()
-                    } else if isLoading {
-                        ProgressView()
-                            .padding()
-                            .padding(.horizontal)
-                    } else {
-                        Text("Let me know which site you'd like to inspect!")
-                            .padding()
-                    }
-                }
-                .adaptiveBackground()
-                .padding(.leading)
-                .padding()
-                .frame(maxWidth: .infinity, alignment: .trailing)
-            }
-            let textField = HStack {
-                TextField("Enter URL…", text: $urlString)
-                    .textContentType(.URL)
-                    .autocorrectionDisabled()
-                    .onSubmit(submit)
-                if !urlString.isEmpty, websiteURL != nil {
+        NavigationStack {
+            VStack {
+                let baseTextField = HStack {
+                    TextField("Enter URL…", text: $urlString)
+                        .textContentType(.URL)
+                        .autocorrectionDisabled()
+                        .onSubmit(submit)
+                    let checkmarkShown = !urlString.isEmpty && websiteURL != nil
                     Label("Valid URL", systemImage: "checkmark.circle")
                         .labelStyle(.iconOnly)
                         .transition(.opacity)
                         .foregroundStyle(.green)
+                        .opacity(checkmarkShown ? 1 : 0)
+                        .accessibilityHidden(!checkmarkShown)
                 }
-            }
-                .padding()
-                .adaptiveBackground()
-                .textFieldStyle(.plain)
-            if #available(iOS 15, *) {
+                    .padding()
+                    .textFieldStyle(.plain)
+                let textField = if #available(iOS 15, *) {
 #if os(iOS)
-                textField.textInputAutocapitalization(.never)
-                    .submitLabel(.send)
+                    AnyView(
+                        baseTextField.textInputAutocapitalization(.never)
+                            .submitLabel(.send)
+                    )
 #else
-                textField
+                    AnyView(baseTextField)
 #endif
-            } else {
-                textField
+                } else {
+                    AnyView(baseTextField)
+                }
+                let scroll = ScrollView {
+                    VStack {
+                        Group {
+                            Text("Let me know which site you'd like to inspect!")
+                                .bubble(.trailing)
+                            if !response.isEmpty {
+                                Text(responseURL)
+                                    .bubble(.leading)
+                                Text(response)
+                                    .bubble(.trailing)
+                            } else if isLoading {
+                                Text(responseURL)
+                                    .bubble(.leading)
+                                ProgressView()
+                                    .bubble(.trailing)
+                            }
+                        }
+                    }
+                    .padding()
+                }
+#if os(macOS)
+                VStack {
+                    scroll
+                    textField
+                        .adaptiveBackground()
+                        .padding([.bottom, .horizontal])
+                }
+#else
+                scroll
+                    .toolbar {
+                        ToolbarItem(placement: .bottomBar) {
+                            if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, *) {
+                                textField
+                            } else {
+                                textField
+                                    .adaptiveBackground()
+                            }
+                        }
+                    }
+#endif
             }
-        }
-        .padding()
-        .background {
-            Image(.rainbow)
-                .accessibilityHidden(true)
+            .background {
+                Image(.rainbow)
+                    .accessibilityHidden(true)
+            }
         }
     }
     
@@ -74,13 +99,17 @@ struct ContentView: View {
         }
     }
     func submit() {
-        response = ""
         guard
             let websiteURL,
             let inspectorURL = URL(string: "http://127.0.0.1:5000/accessibility-improvements/\(websiteURL.absoluteString)")
         else {
             return
         }
+        defer {
+            urlString = ""
+            response = ""
+        }
+        responseURL = urlString
         let request = URLRequest(url: inspectorURL)
         let session = URLSession(configuration: .default)
         isLoading = true
@@ -98,9 +127,9 @@ struct ContentView: View {
 }
 
 #Preview("Loading") {
-    ContentView(isLoading: true)
+    ContentView(responseURL: "example", isLoading: true)
 }
 
 #Preview("Results") {
-    ContentView(response: "Hello, world!")
+    ContentView(responseURL: "example", response: repeatElement("Hello, world!", count: 200).joined(separator: "\n"))
 }
