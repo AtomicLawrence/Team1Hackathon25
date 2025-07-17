@@ -1,4 +1,4 @@
-from typing import Generator, Iterator
+from typing import Iterator
 from openai import OpenAI
 import os
 
@@ -33,9 +33,7 @@ def chat(user_input: str) -> Iterator[str]:
 
     accessibility_suggestions = auditer_gpt(HA_INPUT, GPT_MODEL)
 
-    response = ''
     for chunk in accessibility_suggestions:
         delta = getattr(chunk, 'delta', None)
         if isinstance(delta, str):
-            response += delta
-            yield response
+            yield delta
