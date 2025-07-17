@@ -10,7 +10,7 @@ app = Flask(__name__)
 def hello():
     return "Hello, World!"
 
-@app.route("/accessiblity-improvements/<path:url>", methods=['GET'])
+@app.route("/accessibility-improvements/<path:url>", methods=['GET'])
 def get_accessiblity_imorovements(url: str):
     text_response = ''
 
