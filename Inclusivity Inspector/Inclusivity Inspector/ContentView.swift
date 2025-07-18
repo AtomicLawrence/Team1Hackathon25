@@ -64,7 +64,7 @@ struct ContentView: View {
                             ProgressView()
                                 .bubble(.trailing)
                         } else if !responseURL.isEmpty {
-                            Text(response.isEmpty ? "…" : response)
+                            Text(response.isEmpty ? "…" : LocalizedStringKey(response))
                                 .textSelection(.enabled)
                                 .bubble(.trailing)
                         }
@@ -147,10 +147,17 @@ struct ContentView: View {
             var stringResponse: String?
             do {
                 defer { isLoading = false }
-                let (data, _) = try await session.data(for: request)
-                stringResponse = String(data: data, encoding: .utf8)
-                let decodedResponse = try JSONDecoder().decode(Response.self, from: data)
-                self.response = decodedResponse.text
+                
+                let useLocalResponse = true
+                if useLocalResponse, websiteURL.host()?.wholeMatch(of: /(www\.)?example\.com/) != nil {
+                    try await Task.sleep(for: .seconds(1))
+                    self.response = try String(contentsOf: Bundle.main.url(forResource: "ExampleResponse", withExtension: "txt")!, encoding: .utf8)
+                } else {
+                    let (data, _) = try await session.data(for: request)
+                    stringResponse = String(data: data, encoding: .utf8)
+                    let decodedResponse = try JSONDecoder().decode(Response.self, from: data)
+                    self.response = decodedResponse.text
+                }
             } catch let error as NSError where error.domain == NSURLErrorDomain && error.code == 400 {
                 self.response = "I'm sorry, I couldn't find a website at that address."
             } catch is CancellationError {
@@ -179,5 +186,5 @@ struct Response: Decodable {
 }
 
 #Preview("Results") {
-    ContentView(responseURL: "example", response: repeatElement("Hello, world!", count: 200).joined(separator: "\n"))
+    ContentView(responseURL: "example", response: repeatElement("**Hello, world!**", count: 200).joined(separator: "\n"))
 }
