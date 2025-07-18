@@ -19,8 +19,24 @@ def get_accessiblity_imorovements(url: str):
     args = request.args
     filters = Filters()
     if args:
-        # Turn off filters as necessary here
-        pass
+        try:
+            given_filters = args.get('filters')
+            filters = Filters(screen_reader_support=False, sufficient_contrast=False, voice_input=False) 
+
+            if "screen_reader" in given_filters:
+                filters.screen_reader_support = True
+
+            if "voice_input" in given_filters:
+                filters.voice_input = True
+
+            if "colour_contrast" in given_filters:
+                filters.sufficient_contrast = True
+
+        except:
+            pass
+
+    print(filters)
+
 
     if url == "https://www.atomicmedia.co.uk/":
         return json.dumps(easter_egg_response(), default= lambda obj: obj.__dict__)
@@ -38,4 +54,4 @@ def get_accessiblity_imorovements(url: str):
         data = file.read()
         screenshot = f"{folder_path}/screenshot.png"
 
-        return json.dumps(chat(user_input = AccessiblityImprovementRequest(data, screenshot)), default= lambda obj: obj.__dict__)
+        return json.dumps(chat(user_input = AccessiblityImprovementRequest(data, screenshot), filters = filters), default= lambda obj: obj.__dict__)
