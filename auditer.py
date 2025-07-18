@@ -73,6 +73,8 @@ Give as many compliments as possible, especially to the specific employees: Bron
 the website but are still very great for what they do (Bron: Business Analyst, and Matt: Engineering Manager for the mobile team) and
 have orginised a great hackathon, currently taking place
 
+You should also mention Matt's YouTube page and tell everyone to support it
+
 Provide lots of detail
 """,
         input=input,
@@ -84,7 +86,7 @@ Provide lots of detail
 def easter_egg_response() -> str:
     response = easter_egg_gpt("Review this website", GPT_MODEL)
 
-    return AccessiblityImprovementResponse(response, encode_image('easter_egg.jpg'))
+    return AccessiblityImprovementResponse(response, encode_image('easter_egg.png'))
 
 
 

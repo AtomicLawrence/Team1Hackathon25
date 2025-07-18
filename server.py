@@ -1,7 +1,8 @@
-from flask import Flask, make_response, jsonify, request
+from flask import Flask, make_response, request
 from auditer import chat, easter_egg_response
 from scraper import save_page_data_to_folder, get_folder_path
 from request_object import AccessiblityImprovementRequest
+from filters import Filters
 import json
 import os
 
@@ -16,7 +17,9 @@ def hello():
 @app.route("/accessibility-improvements/<path:url>", methods=['GET'])
 def get_accessiblity_imorovements(url: str):
     args = request.args
-    if not args:
+    filters = Filters()
+    if args:
+        # Turn off filters as necessary here
         pass
 
     if url == "https://www.atomicmedia.co.uk/":
