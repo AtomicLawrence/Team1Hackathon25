@@ -13,124 +13,136 @@ struct ContentView: View {
     @State var responseImage: Image? = nil
     @State var response = ""
     @State var isLoading = false
+    @State private var showImage = false
     @State private var task: Task<(), Error>? = nil
+    @Namespace private var ns
     
     var body: some View {
         NavigationStack {
-            VStack {
-                let baseTextField = HStack {
-                    TextField("Enter URL…", text: $urlString)
-                        .textContentType(.URL)
-                        .autocorrectionDisabled()
-                        .onSubmit(submit)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    let checkmarkShown = !urlString.isEmpty && websiteURL != nil
-                    let checkmarkButton = Button(action: submit) {
-                        Label("Valid URL", systemImage: "checkmark.circle")
-                            .labelStyle(.iconOnly)
-                            .imageScale(.large)
-                            .transition(.opacity)
-                            .foregroundStyle(.green)
+            if showImage {
+                ImageViewer(image: responseImage, isShown: $showImage)
+            } else {
+                VStack {
+                    let baseTextField = HStack {
+                        TextField("Enter URL…", text: $urlString)
+                            .textContentType(.URL)
+                            .autocorrectionDisabled()
+                            .onSubmit(submit)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        let checkmarkShown = !urlString.isEmpty && websiteURL != nil
+                        let checkmarkButton = Button(action: submit) {
+                            Label("Valid URL", systemImage: "checkmark.circle")
+                                .labelStyle(.iconOnly)
+                                .imageScale(.large)
+                                .transition(.opacity)
+                                .foregroundStyle(.green)
+                        }
+                            .buttonStyle(.accessoryBar)
+                        if checkmarkShown {
+                            checkmarkButton
+                        } else {
+                            checkmarkButton.hidden()
+                        }
                     }
-                        .buttonStyle(.accessoryBar)
-                    if checkmarkShown {
-                        checkmarkButton
-                    } else {
-                        checkmarkButton.hidden()
-                    }
-                }
-                    .textFieldStyle(.plain)
-                let textField = if #available(iOS 15, visionOS 15, *) {
+                        .textFieldStyle(.plain)
+                    let textField = if #available(iOS 15, visionOS 15, *) {
 #if os(iOS)
-                    AnyView(
-                        baseTextField
-                            .textInputAutocapitalization(.never)
-                            .submitLabel(.send)
-                    )
-#else
-                    AnyView(baseTextField)
-#endif
-                } else {
-                    AnyView(baseTextField)
-                }
-                let scroll = ScrollView {
-                    VStack {
-                        Text("Let me know which site you'd like to inspect!")
-                            .bubble(.trailing)
-                        if !responseURL.isEmpty {
-                            Text(responseURL)
-                                .bubble(.leading)
-                        }
-                        if !responseURL.isEmpty {
-                            Text("Analysing *\(responseURL)* for accessibility issues…")
-                                .bubble(.trailing)
-                            if isLoading {
-                                TypingIndicator()
-                                    .bubble(.trailing)
-                            }
-                            
-                            if !isLoading {
-                                if let responseImage {
-                                    responseImage
-                                        .resizable()
-                                        .scaledToFit()
-                                }
-                                Text(response.isEmpty ? "…" : LocalizedStringKey(response))
-                                    .textSelection(.enabled)
-                                    .bubble(.trailing)
-                            }
-                        }
-                    }
-                    .padding()
-                }
-                Group {
-                    let fallback = scroll
-                        .safeAreaInset(edge: .bottom, spacing: 0) {
-                            textField
-                                .padding(12)
-                                .adaptiveBackground(Capsule(style: .continuous))
-                                .padding([.bottom, .horizontal])
-                        }
-                        .navigationTitle(
-                            Text("One for A11y")
-                                .accessibilityLabel("One for Ally")
+                        AnyView(
+                            baseTextField
+                                .textInputAutocapitalization(.never)
+                                .submitLabel(.send)
                         )
-#if !os(macOS)
-                    if #available(iOS 26.0, tvOS 26.0, watchOS 26.0, visionOS 26.0, *) {
-                        scroll
-                            .toolbar {
-                                ToolbarItem(placement: .bottomBar) {
-                                    textField
-                                        .padding(4)
-                                        .padding(.horizontal, 4)
-                                }
-                                ToolbarItem(placement: .title) {
-                                    HStack {
-                                        Image(.logo)
-                                            .resizable()
-                                            .scaledToFit()
-                                            .accessibilityHidden(true)
-                                            .frame(idealHeight: 0)
-                                            .cornerRadius(4)
-                                        Text("One for A11y")
-                                            .accessibilityLabel("One for Ally")
-                                            .bold()
+#else
+                        AnyView(baseTextField)
+#endif
+                    } else {
+                        AnyView(baseTextField)
+                    }
+                    let scroll = ScrollView {
+                        VStack {
+                            Text("Let me know which site you'd like to inspect!")
+                                .bubble(.trailing)
+                            if !responseURL.isEmpty {
+                                Text(responseURL)
+                                    .bubble(.leading)
+                            }
+                            if !responseURL.isEmpty {
+                                Text("Analysing \(responseURL) for accessibility issues…")
+                                    .bubble(.trailing)
+                                if isLoading {
+                                    TypingIndicator()
+                                        .bubble(.trailing)
+                                } else {
+                                    if let responseImage {
+                                        Button {
+                                            showImage = true
+                                        } label: {
+                                            responseImage
+                                                .resizable()
+                                                .scaledToFit()
+                                        }
+                                        .buttonStyle(.plain)
+                                        .ignoresSafeArea()
+                                        .bubble(.trailing)
+                                        .frame(height: 320)
                                     }
-                                    .fixedSize(horizontal: true, vertical: false)
-                                    .font(.title)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    Text(response.isEmpty ? "…" : response)
+                                        .textSelection(.enabled)
+                                        .bubble(.trailing)
                                 }
                             }
-                    } else {
-                        fallback
+                        }
+                        .padding()
                     }
+                    Group {
+                        let fallback = scroll
+                            .safeAreaInset(edge: .bottom, spacing: 0) {
+                                textField
+                                    .padding(12)
+                                    .adaptiveBackground(Capsule(style: .continuous))
+                                    .padding([.bottom, .horizontal])
+                            }
+                            .navigationTitle(
+                                Text("One for A11y")
+                                    .accessibilityLabel("One for Ally")
+                            )
+#if !os(macOS)
+                        if #available(iOS 26.0, tvOS 26.0, watchOS 26.0, visionOS 26.0, *) {
+                            scroll
+                                .toolbar {
+                                    ToolbarItem(placement: .bottomBar) {
+                                        textField
+                                            .padding(4)
+                                            .padding(.horizontal, 4)
+                                    }
+                                    ToolbarItem(placement: .title) {
+                                        HStack {
+                                            Image(.logo)
+                                                .resizable()
+                                                .scaledToFit()
+                                                .accessibilityHidden(true)
+                                                .frame(idealHeight: 0)
+                                                .cornerRadius(4)
+                                            Text("One for A11y")
+                                                .accessibilityLabel("One for Ally")
+                                                .bold()
+                                        }
+                                        .fixedSize(horizontal: true, vertical: false)
+                                        .font(.title)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                    }
+                                }
+                        } else {
+                            fallback
+                        }
 #else
-                    fallback
+                        fallback
 #endif
+                    }
                 }
             }
-            .background(Color(.appBackground), ignoresSafeAreaEdges: .all)
         }
+        .background(Color(.appBackground), ignoresSafeAreaEdges: .all)
     }
     
     var websiteURL: URL? {
@@ -164,13 +176,17 @@ struct ContentView: View {
                 let useLocalResponse = true
                 if useLocalResponse, websiteURL.host()?.wholeMatch(of: /(www\.)?example\.com/) != nil {
                     try await Task.sleep(for: .seconds(1))
-                    self.response = try String(contentsOf: Bundle.main.url(forResource: "ExampleResponse", withExtension: "txt")!, encoding: .utf8)
+                    let string = try String(contentsOf: Bundle.main.url(forResource: "ExampleResponse", withExtension: "txt")!, encoding: .utf8)
+                    stringResponse = string
+                    let decodedResponse = try JSONDecoder().decode(Response.self, from: string.data(using: .utf8)!)
+                    self.response = decodedResponse.text
+                    self.responseImage = Image(base64: decodedResponse.screenshot)
                 } else {
                     let (data, _) = try await session.data(for: request)
                     stringResponse = String(data: data, encoding: .utf8)
                     let decodedResponse = try JSONDecoder().decode(Response.self, from: data)
                     self.response = decodedResponse.text
-                    self.responseImage = Image(data: decodedResponse.screenshot)
+                    self.responseImage = Image(base64: decodedResponse.screenshot)
                 }
             } catch let error as NSError where error.domain == NSURLErrorDomain && error.code == 400 {
                 self.response = "I'm sorry, I couldn't find a website at that address."
@@ -187,23 +203,29 @@ struct ContentView: View {
 }
 
 extension Image {
+    init?(base64: Data) {
+        self.init(data: base64)
+    }
     init?(data: Data) {
 #if os(macOS)
         if let image = NSImage(data: data) {
             self.init(nsImage: image)
+        } else {
+            return nil
         }
 #else
         if let image = UIImage(data: data) {
             self.init(uiImage: image)
+        } else {
+            return nil
         }
 #endif
-        return nil
     }
 }
 
 struct Response: Decodable {
     var text: String
-    var screenshot: Data // or String
+    var screenshot: Data
 }
 
 #Preview("Default") {
@@ -216,4 +238,8 @@ struct Response: Decodable {
 
 #Preview("Results") {
     ContentView(responseURL: "example", response: repeatElement("**Hello, world!**", count: 200).joined(separator: "\n"))
+}
+
+#Preview("Live") {
+    ContentView(urlString: "example.com")
 }

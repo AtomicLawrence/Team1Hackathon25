@@ -409,6 +409,7 @@
 				ENABLE_RESOURCE_ACCESS_USB = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Inclusivity-Inspector-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "One for A11y";
 				INFOPLIST_KEY_LSApplicationCategoryType = "<key>NSAppTransportSecurity</key>\n<dict>\n      <key>NSAllowsArbitraryLoads</key> \n      <false/>\n       <key>NSExceptionDomains</key>\n       <dict>\n            <key>example.com</key> <!--Include your domain at this line -->\n            <dict>\n                <key>NSIncludesSubdomains</key>\n                <true/>\n                <key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>\n                <true/>\n                <key>NSTemporaryExceptionMinimumTLSVersion</key>\n                <string>TLSv1.1</string>\n            </dict>\n       </dict>\n</dict>";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
@@ -461,6 +462,7 @@
 				ENABLE_RESOURCE_ACCESS_USB = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Inclusivity-Inspector-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "One for A11y";
 				INFOPLIST_KEY_LSApplicationCategoryType = "<key>NSAppTransportSecurity</key>\n<dict>\n      <key>NSAllowsArbitraryLoads</key> \n      <false/>\n       <key>NSExceptionDomains</key>\n       <dict>\n            <key>example.com</key> <!--Include your domain at this line -->\n            <dict>\n                <key>NSIncludesSubdomains</key>\n                <true/>\n                <key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>\n                <true/>\n                <key>NSTemporaryExceptionMinimumTLSVersion</key>\n                <string>TLSv1.1</string>\n            </dict>\n       </dict>\n</dict>";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
