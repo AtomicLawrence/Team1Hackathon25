@@ -11,7 +11,7 @@ import SwiftUI
 struct Inclusivity_InspectorApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            TabContainer()
         }
     }
 }

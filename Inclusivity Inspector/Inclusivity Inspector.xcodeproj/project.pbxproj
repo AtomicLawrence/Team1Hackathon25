@@ -24,7 +24,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		1A23DF332E293C1300BA7D13 /* Inclusivity Inspector.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Inclusivity Inspector.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		1A23DF332E293C1300BA7D13 /* One for A11y.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "One for A11y.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1A23DF412E293C1400BA7D13 /* Inclusivity InspectorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Inclusivity InspectorTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1A23DF4B2E293C1400BA7D13 /* Inclusivity InspectorUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Inclusivity InspectorUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -85,7 +85,7 @@
 		1A23DF342E293C1300BA7D13 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				1A23DF332E293C1300BA7D13 /* Inclusivity Inspector.app */,
+				1A23DF332E293C1300BA7D13 /* One for A11y.app */,
 				1A23DF412E293C1400BA7D13 /* Inclusivity InspectorTests.xctest */,
 				1A23DF4B2E293C1400BA7D13 /* Inclusivity InspectorUITests.xctest */,
 			);
@@ -114,7 +114,7 @@
 			packageProductDependencies = (
 			);
 			productName = "Inclusivity Inspector";
-			productReference = 1A23DF332E293C1300BA7D13 /* Inclusivity Inspector.app */;
+			productReference = 1A23DF332E293C1300BA7D13 /* One for A11y.app */;
 			productType = "com.apple.product-type.application";
 		};
 		1A23DF402E293C1400BA7D13 /* Inclusivity InspectorTests */ = {
@@ -427,7 +427,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 15.5;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "AtomicMedia.Inclusivity-Inspector";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "One for A11y";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
@@ -480,7 +480,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 15.5;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "AtomicMedia.Inclusivity-Inspector";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "One for A11y";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
