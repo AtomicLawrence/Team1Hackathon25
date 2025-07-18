@@ -20,7 +20,8 @@ struct Bubble: ViewModifier {
         content
             .padding(8)
             .padding(.horizontal, 8)
-            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
+            .background(.blue.opacity(alignment == .leading ? 0.5 : 0), in: RoundedRectangle(cornerRadius: 16))
+            .background(.background, in: RoundedRectangle(cornerRadius: 16))
             .frame(maxWidth: .infinity, alignment: Alignment(horizontal: alignment == .leading ? .leading : .trailing, vertical: .center))
             .padding(alignment == .leading ? .trailing : .leading)
     }

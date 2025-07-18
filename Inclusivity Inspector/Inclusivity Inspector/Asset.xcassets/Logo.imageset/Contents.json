@@ -1,0 +1,15 @@
+{
+  "images" : [
+    {
+      "filename" : "One for A11y logo.svg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  },
+  "properties" : {
+    "preserves-vector-representation" : true
+  }
+}

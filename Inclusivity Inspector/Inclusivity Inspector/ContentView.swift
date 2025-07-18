@@ -24,21 +24,26 @@ struct ContentView: View {
                         .onSubmit(submit)
                         .frame(maxWidth: .infinity, alignment: .leading)
                     let checkmarkShown = !urlString.isEmpty && websiteURL != nil
+                    let checkmarkButton = Button(action: submit) {
+                        Label("Valid URL", systemImage: "checkmark.circle")
+                            .labelStyle(.iconOnly)
+                            .imageScale(.large)
+                            .transition(.opacity)
+                            .foregroundStyle(.green)
+                    }
+                        .buttonStyle(.accessoryBar)
                     if checkmarkShown {
-                        Button(action: submit) {
-                            Label("Valid URL", systemImage: "checkmark.circle")
-                                .labelStyle(.iconOnly)
-                                .transition(.opacity)
-                                .foregroundStyle(.green)
-                        }
+                        checkmarkButton
+                    } else {
+                        checkmarkButton.hidden()
                     }
                 }
-                    .padding(12)
                     .textFieldStyle(.plain)
-                let textField = if #available(iOS 15, *) {
+                let textField = if #available(iOS 15, visionOS 15, *) {
 #if os(iOS)
                     AnyView(
-                        baseTextField.textInputAutocapitalization(.never)
+                        baseTextField
+                            .textInputAutocapitalization(.never)
                             .submitLabel(.send)
                     )
 #else
@@ -49,51 +54,70 @@ struct ContentView: View {
                 }
                 let scroll = ScrollView {
                     VStack {
-                        Group {
-                            Text("Let me know which site you'd like to inspect!")
+                        Text("Let me know which site you'd like to inspect!")
+                            .bubble(.trailing)
+                        if !responseURL.isEmpty {
+                            Text(responseURL)
+                                .bubble(.leading)
+                        }
+                        if isLoading {
+                            ProgressView()
                                 .bubble(.trailing)
-                            if !responseURL.isEmpty {
-                                Text(responseURL)
-                                    .bubble(.leading)
-                            }
-                            if isLoading {
-                                ProgressView()
-                                    .bubble(.trailing)
-                            }
-                            if !responseURL.isEmpty {
-                                Text(response.isEmpty ? "…" : response)
-                                    .textSelection(.enabled)
-                                    .bubble(.trailing)
-                            }
+                        } else if !responseURL.isEmpty {
+                            Text(response.isEmpty ? "…" : response)
+                                .textSelection(.enabled)
+                                .bubble(.trailing)
                         }
                     }
                     .padding()
                 }
-#if os(macOS)
-                VStack {
-                    scroll
-                    textField
-                        .adaptiveBackground()
-                        .padding([.bottom, .horizontal])
-                }
-#else
-                scroll
-                    .toolbar {
-                        ToolbarItem(placement: .bottomBar) {
-                            if #available(iOS 26.0, macOS 26.0, tvOS 26.0, watchOS 26.0, *) {
-                                textField
-                            } else {
-                                textField
-                                    .adaptiveBackground()
-                            }
+                Group {
+                    let fallback = scroll
+                        .safeAreaInset(edge: .bottom, spacing: 0) {
+                            textField
+                                .padding(12)
+                                .adaptiveBackground(Capsule(style: .continuous))
+                                .padding([.bottom, .horizontal])
                         }
+                        .navigationTitle(
+                            Text("One for A11y")
+                                .accessibilityLabel("One for Ally")
+                        )
+#if !os(macOS)
+                    if #available(iOS 26.0, tvOS 26.0, watchOS 26.0, visionOS 26.0, *) {
+                        scroll
+                            .toolbar {
+                                ToolbarItem(placement: .bottomBar) {
+                                    textField
+                                        .padding(4)
+                                        .padding(.horizontal, 4)
+                                }
+                                ToolbarItem(placement: .title) {
+                                    HStack {
+                                        Image(.logo)
+                                            .resizable()
+                                            .scaledToFit()
+                                            .accessibilityHidden(true)
+                                            .frame(idealHeight: 0)
+                                            .cornerRadius(4)
+                                        Text("One for A11y")
+                                            .accessibilityLabel("One for Ally")
+                                            .bold()
+                                    }
+                                    .fixedSize(horizontal: true, vertical: false)
+                                    .font(.title)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                }
+                            }
+                    } else {
+                        fallback
                     }
+#else
+                    fallback
 #endif
+                }
             }
-            .background {
-                Image(.rainbow)
-                    .accessibilityHidden(true)
-            }
+            .background(Color(.appBackground), ignoresSafeAreaEdges: .all)
         }
     }
     
@@ -123,15 +147,22 @@ struct ContentView: View {
             do {
                 defer { isLoading = false }
                 let (data, _) = try await session.data(for: request)
-                let string = String(data: data, encoding: .utf8)
-                self.response = string ?? "Failed to load data"
+                let decodedResponse = try JSONDecoder().decode(Response.self, from: data)
+                self.response = decodedResponse.text
             } catch let error as NSError where error.domain == NSURLErrorDomain && error.code == 400 {
                 self.response = "I'm sorry, I couldn't find a website at that address."
+            } catch is CancellationError {
+                // Do nothing
             } catch {
                 self.response = "Error: \(error)"
             }
         }
     }
+}
+
+struct Response: Decodable {
+    var text: String
+    var screenshot: Data // or String
 }
 
 #Preview("Default") {
