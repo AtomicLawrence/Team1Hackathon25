@@ -1,7 +1,8 @@
-from flask import Flask, make_response
+from flask import Flask, make_response, jsonify
 from auditer import chat, easter_egg_response
 from scraper import save_page_data_to_folder, get_folder_path
 from request_object import AccessiblityImprovementRequest
+import json
 import os
 
 DIRECTORY_ROOT= "page_data"
@@ -14,13 +15,9 @@ def hello():
 
 @app.route("/accessibility-improvements/<path:url>", methods=['GET'])
 def get_accessiblity_imorovements(url: str):
-    text_response = ''
 
     if url == "https://www.atomicmedia.co.uk/":
-        for outputChunk in easter_egg_response():
-           text_response += outputChunk
-
-        return text_response
+        return jsonify(json.dumps(easter_egg_response(), default= lambda obj: obj.__dict__))
 
 
     save_page_data_to_folder(url)
@@ -28,12 +25,11 @@ def get_accessiblity_imorovements(url: str):
     folder_path = get_folder_path(url)
 
     if not (os.path.isfile(f"{folder_path}/html.txt") and os.path.isfile(f"{folder_path}/screenshot.png")):
+        # Delete empty directory
         make_response('Not a valid website', 400)
     
     with open(f"{folder_path}/html.txt", 'r') as file:
         data = file.read()
         screenshot = f"{folder_path}/screenshot.png"
 
-        response = chat(user_input = AccessiblityImprovementRequest(data, screenshot))
-
-        return response
+        return jsonify(json.dumps(chat(user_input = AccessiblityImprovementRequest(data, screenshot)), default= lambda obj: obj.__dict__))
