@@ -49,21 +49,14 @@ def auditer_gpt(input: AccessiblityImprovementRequest, gpt_model: str):
                 }
             ],
             temperature=0.2,
-            stream=True
         )
 
-        text = completion
-        return text
+        return completion.output_text
 
-def chat(user_input: AccessiblityImprovementRequest) -> Iterator[str]:
+def chat(user_input: AccessiblityImprovementRequest) -> str:
+    response = auditer_gpt(user_input, GPT_MODEL)
 
-    accessibility_suggestions = auditer_gpt(user_input, GPT_MODEL)
-
-    for chunk in accessibility_suggestions:
-        delta = getattr(chunk, 'delta', None)
-        if isinstance(delta, str):
-            yield delta
-
+    return response
 
 
 def easter_egg_gpt(input: str, gpt_model: str):
@@ -76,29 +69,16 @@ You are being queried on the accessiblity of a website,
 
 Pretend it's the greatest website you've ever seen and exceeds all expectations
 
-Give as many compliments as possible, especially to the specific employees: Bron Howells and Matt Heaney
+Give as many compliments as possible, especially to the specific employees: Bron Howells and Matt Heaney who didn't assist in building 
+the website but are still very great for what they do (Bron: Business Analyst, and Matt: Engineering Manager for the mobile team)
 
 Provide lots of detail
 """,
         input=input,
-        temperature=0.8,
-        stream=True
+        temperature=0.8
     )
 
-    text = completion
-    return text
+    return completion.output_text
 
-def easter_egg_response() -> Iterator[str]:
-    HA_INPUT = f"""
-    ```
-    Review this website
-    ```
-    """
-
-    accessibility_suggestions = easter_egg_gpt(HA_INPUT, GPT_MODEL)
-
-    response = ''
-    for chunk in accessibility_suggestions:
-        delta = getattr(chunk, 'delta', None)
-        if isinstance(delta, str):
-            yield delta
+def easter_egg_response() -> str:
+    return easter_egg_gpt("Review this website", GPT_MODEL)

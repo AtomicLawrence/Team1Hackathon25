@@ -1,4 +1,4 @@
-from flask import Flask, abort
+from flask import Flask, make_response
 from auditer import chat, easter_egg_response
 from scraper import save_page_data_to_folder, get_folder_path
 from request_object import AccessiblityImprovementRequest
@@ -28,13 +28,12 @@ def get_accessiblity_imorovements(url: str):
     folder_path = get_folder_path(url)
 
     if not (os.path.isfile(f"{folder_path}/html.txt") and os.path.isfile(f"{folder_path}/screenshot.png")):
-        abort(400, 'Website not found') 
+        make_response('Not a valid website', 400)
     
     with open(f"{folder_path}/html.txt", 'r') as file:
         data = file.read()
         screenshot = f"{folder_path}/screenshot.png"
 
-        for outputChunk in chat(user_input = AccessiblityImprovementRequest(data, screenshot)):
-           text_response += outputChunk
+        response = chat(user_input = AccessiblityImprovementRequest(data, screenshot))
 
-    return text_response
+        return response
