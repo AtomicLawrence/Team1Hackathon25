@@ -8,9 +8,11 @@ from pathlib import Path
 DIRECTORY_ROOT = "page_data"
 MAX_HTML_LENGTH = 500000
 
+def get_url_domain(url: str) -> str:
+    return tldextract.extract(url).domain
 
 def get_folder_path(url: str) -> str:
-    return f"{DIRECTORY_ROOT}/{tldextract.extract(url).domain}"
+    return f"{DIRECTORY_ROOT}/{get_url_domain(url)}"
 
 def save_page_data_to_folder(url: str) -> None:
     file_directory_base = get_folder_path(url)

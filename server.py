@@ -1,6 +1,6 @@
 from flask import Flask, make_response, request
 from auditer import chat, easter_egg_response
-from scraper import save_page_data_to_folder, get_folder_path
+from scraper import save_page_data_to_folder, get_folder_path, get_url_domain
 from request_object import AccessiblityImprovementRequest
 from filters import Filters
 import json
@@ -37,8 +37,7 @@ def get_accessiblity_imorovements(url: str):
 
     print(filters)
 
-
-    if url == "https://www.atomicmedia.co.uk/":
+    if get_url_domain(url) == "atomicmedia":
         return json.dumps(easter_egg_response(), default= lambda obj: obj.__dict__)
 
 
