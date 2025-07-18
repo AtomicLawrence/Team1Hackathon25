@@ -1,4 +1,4 @@
-from flask import Flask, make_response, jsonify
+from flask import Flask, make_response, jsonify, request
 from auditer import chat, easter_egg_response
 from scraper import save_page_data_to_folder, get_folder_path
 from request_object import AccessiblityImprovementRequest
@@ -15,9 +15,12 @@ def hello():
 
 @app.route("/accessibility-improvements/<path:url>", methods=['GET'])
 def get_accessiblity_imorovements(url: str):
+    args = request.args
+    if not args:
+        pass
 
     if url == "https://www.atomicmedia.co.uk/":
-        return jsonify(json.dumps(easter_egg_response(), default= lambda obj: obj.__dict__))
+        return json.dumps(easter_egg_response(), default= lambda obj: obj.__dict__)
 
 
     save_page_data_to_folder(url)
@@ -32,4 +35,4 @@ def get_accessiblity_imorovements(url: str):
         data = file.read()
         screenshot = f"{folder_path}/screenshot.png"
 
-        return jsonify(json.dumps(chat(user_input = AccessiblityImprovementRequest(data, screenshot)), default= lambda obj: obj.__dict__))
+        return json.dumps(chat(user_input = AccessiblityImprovementRequest(data, screenshot)), default= lambda obj: obj.__dict__)

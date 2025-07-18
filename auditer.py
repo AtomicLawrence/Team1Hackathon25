@@ -84,7 +84,7 @@ Provide lots of detail
 def easter_egg_response() -> str:
     response = easter_egg_gpt("Review this website", GPT_MODEL)
 
-    return AccessiblityImprovementResponse(response, encode_image('page_data/easter_egg.jpg'))
+    return AccessiblityImprovementResponse(response, encode_image('easter_egg.jpg'))
 
 
 
