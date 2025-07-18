@@ -20,10 +20,7 @@ struct AdaptiveBackground<BackgroundShape: Shape>: ViewModifier {
                 .glassEffect(.regular, in: shape, isEnabled: true)
         } else {
             content
-                .background {
-                    shape
-                        .fill(.regularMaterial)
-                }
+                .background(.regularMaterial, in: shape)
         }
     }
 }

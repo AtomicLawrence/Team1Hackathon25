@@ -22,15 +22,18 @@ struct ContentView: View {
                         .textContentType(.URL)
                         .autocorrectionDisabled()
                         .onSubmit(submit)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     let checkmarkShown = !urlString.isEmpty && websiteURL != nil
-                    Label("Valid URL", systemImage: "checkmark.circle")
-                        .labelStyle(.iconOnly)
-                        .transition(.opacity)
-                        .foregroundStyle(.green)
-                        .opacity(checkmarkShown ? 1 : 0)
-                        .accessibilityHidden(!checkmarkShown)
+                    if checkmarkShown {
+                        Button(action: submit) {
+                            Label("Valid URL", systemImage: "checkmark.circle")
+                                .labelStyle(.iconOnly)
+                                .transition(.opacity)
+                                .foregroundStyle(.green)
+                        }
+                    }
                 }
-                    .padding()
+                    .padding(12)
                     .textFieldStyle(.plain)
                 let textField = if #available(iOS 15, *) {
 #if os(iOS)
@@ -49,16 +52,17 @@ struct ContentView: View {
                         Group {
                             Text("Let me know which site you'd like to inspect!")
                                 .bubble(.trailing)
-                            if !response.isEmpty {
+                            if !responseURL.isEmpty {
                                 Text(responseURL)
                                     .bubble(.leading)
-                                Text(response)
-                                    .textSelection(.enabled)
-                                    .bubble(.trailing)
-                            } else if isLoading {
-                                Text(responseURL)
-                                    .bubble(.leading)
+                            }
+                            if isLoading {
                                 ProgressView()
+                                    .bubble(.trailing)
+                            }
+                            if !responseURL.isEmpty {
+                                Text(response.isEmpty ? "…" : response)
+                                    .textSelection(.enabled)
                                     .bubble(.trailing)
                             }
                         }
@@ -102,25 +106,30 @@ struct ContentView: View {
     }
     func submit() {
         task?.cancel()
+        responseURL = urlString
         guard
             let websiteURL,
             let inspectorURL = URL(string: "http://127.0.0.1:5000/accessibility-improvements/\(websiteURL.absoluteString)")
         else {
+            response = "I'm sorry, the URL you entered is invalid."
             return
         }
-        defer {
-            urlString = ""
-            response = ""
-        }
-        responseURL = urlString
+        urlString = ""
+        response = ""
         let request = URLRequest(url: inspectorURL)
         let session = URLSession(configuration: .default)
         isLoading = true
         task = Task {
-            defer { isLoading = false }
-            let (data, _) = try await session.data(for: request)
-            let string = String(data: data, encoding: .utf8)
-            self.response = string ?? "Failed to load data"
+            do {
+                defer { isLoading = false }
+                let (data, _) = try await session.data(for: request)
+                let string = String(data: data, encoding: .utf8)
+                self.response = string ?? "Failed to load data"
+            } catch let error as NSError where error.domain == NSURLErrorDomain && error.code == 400 {
+                self.response = "I'm sorry, I couldn't find a website at that address."
+            } catch {
+                self.response = "Error: \(error)"
+            }
         }
     }
 }
