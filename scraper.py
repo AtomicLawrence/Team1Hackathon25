@@ -48,7 +48,7 @@ def scrape_page(url: str, file_directory_base: str) -> None:
 
 
 def get_html(soup: BeautifulSoup) -> str:
-    body = soup.find('body').prettify()
+    body = soup.prettify()
 
     truncated_html = body[:MAX_HTML_LENGTH]
 
