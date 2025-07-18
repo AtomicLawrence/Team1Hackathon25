@@ -144,9 +144,11 @@ struct ContentView: View {
         let session = URLSession(configuration: .default)
         isLoading = true
         task = Task {
+            var stringResponse: String?
             do {
                 defer { isLoading = false }
                 let (data, _) = try await session.data(for: request)
+                stringResponse = String(data: data, encoding: .utf8)
                 let decodedResponse = try JSONDecoder().decode(Response.self, from: data)
                 self.response = decodedResponse.text
             } catch let error as NSError where error.domain == NSURLErrorDomain && error.code == 400 {
@@ -155,6 +157,9 @@ struct ContentView: View {
                 // Do nothing
             } catch {
                 self.response = "Error: \(error)"
+                if let stringResponse {
+                    self.response += "\n\n" + stringResponse
+                }
             }
         }
     }
