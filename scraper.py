@@ -5,7 +5,8 @@ import tldextract
 from pathlib import Path
 
 
-DIRECTORY_ROOT= "page_data"
+DIRECTORY_ROOT = "page_data"
+MAX_HTML_LENGTH = 500000
 
 
 def get_folder_path(url: str) -> str:
@@ -38,6 +39,7 @@ def scrape_page(url: str, file_directory_base: str) -> None:
         soup = BeautifulSoup(html_content, 'html.parser')
 
         html = get_html(soup)
+
         with open(f"{file_directory_base}/html.txt", "w") as text_file:
             text_file.write(html)
 
@@ -46,7 +48,11 @@ def scrape_page(url: str, file_directory_base: str) -> None:
 
 
 def get_html(soup: BeautifulSoup) -> str:
-    return soup.prettify()
+    body = soup.find('body').prettify()
+
+    truncated_html = body[:MAX_HTML_LENGTH]
+
+    return truncated_html
 
 
 # def get_css(soup: BeautifulSoup) -> list[str]:
