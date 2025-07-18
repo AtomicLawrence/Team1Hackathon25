@@ -8,21 +8,20 @@
 import SwiftUI
 
 struct ImageViewer: View {
-    var image: Image?
-    @Binding var isShown: Bool
+    @Binding var image: Image?
     
     var body: some View {
         Group {
-            if let image {
-                image
-                    .resizable()
-                    .scaledToFit()
-            } else {
-                Text("No content")
-            }
+            ScrollView([.horizontal, .vertical]) {
+                if let image {
+                    image
+                } else {
+                    Text("No content")
+                }
+            }.defaultScrollAnchor(.top)
         }.toolbar {
             Button {
-                isShown = false
+                image = nil
             } label: {
                 Label("Close", systemImage: "xmark")
             }
@@ -31,6 +30,6 @@ struct ImageViewer: View {
 }
 
 #Preview {
-    ImageViewer(isShown: .constant(true))
+    ImageViewer(image: .constant(Image(systemName: "photo")))
         .padding()
 }
