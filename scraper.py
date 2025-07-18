@@ -15,8 +15,11 @@ def save_page_data_to_folder(url: str) -> None:
     file_directory_base = get_folder_path(url)
     Path(file_directory_base).mkdir(parents=True, exist_ok=True)
     scrape_page(url, file_directory_base)
-    with sync_playwright() as playwright:
-        take_screenshot(playwright, url, file_directory_base)
+    try:
+        with sync_playwright() as playwright:
+            take_screenshot(playwright, url, file_directory_base)
+    except:
+        print("Failed to find website")
 
 
 def take_screenshot(playwright, url: str, file_directory_base: str) -> None:
@@ -27,14 +30,19 @@ def take_screenshot(playwright, url: str, file_directory_base: str) -> None:
     browser.close()
 
 def scrape_page(url: str, file_directory_base: str) -> None:
-    response = requests.get(url)
-    html_content = response.text
+    try:
+        response = requests.get(url)
 
-    soup = BeautifulSoup(html_content, 'html.parser')
+        html_content = response.text
 
-    html = get_html(soup)
-    with open(f"{file_directory_base}/html.txt", "w") as text_file:
-        text_file.write(html)
+        soup = BeautifulSoup(html_content, 'html.parser')
+
+        html = get_html(soup)
+        with open(f"{file_directory_base}/html.txt", "w") as text_file:
+            text_file.write(html)
+
+    except:
+        print("Failed to find website")
 
 
 def get_html(soup: BeautifulSoup) -> str:
