@@ -10,6 +10,7 @@ import SwiftUI
 struct ContentView: View {
     @State var urlString = ""
     @State var responseURL = ""
+    @State var responseImage: Image? = nil
     @State var response = ""
     @State var isLoading = false
     @State private var task: Task<(), Error>? = nil
@@ -60,13 +61,24 @@ struct ContentView: View {
                             Text(responseURL)
                                 .bubble(.leading)
                         }
-                        if isLoading {
-                            ProgressView()
+                        if !responseURL.isEmpty {
+                            Text("Analysing *\(responseURL)* for accessibility issues…")
                                 .bubble(.trailing)
-                        } else if !responseURL.isEmpty {
-                            Text(response.isEmpty ? "…" : LocalizedStringKey(response))
-                                .textSelection(.enabled)
-                                .bubble(.trailing)
+                            if isLoading {
+                                TypingIndicator()
+                                    .bubble(.trailing)
+                            }
+                            
+                            if !isLoading {
+                                if let responseImage {
+                                    responseImage
+                                        .resizable()
+                                        .scaledToFit()
+                                }
+                                Text(response.isEmpty ? "…" : LocalizedStringKey(response))
+                                    .textSelection(.enabled)
+                                    .bubble(.trailing)
+                            }
                         }
                     }
                     .padding()
@@ -140,6 +152,7 @@ struct ContentView: View {
         }
         urlString = ""
         response = ""
+        responseImage = nil
         let request = URLRequest(url: inspectorURL)
         let session = URLSession(configuration: .default)
         isLoading = true
@@ -157,6 +170,7 @@ struct ContentView: View {
                     stringResponse = String(data: data, encoding: .utf8)
                     let decodedResponse = try JSONDecoder().decode(Response.self, from: data)
                     self.response = decodedResponse.text
+                    self.responseImage = Image(data: decodedResponse.screenshot)
                 }
             } catch let error as NSError where error.domain == NSURLErrorDomain && error.code == 400 {
                 self.response = "I'm sorry, I couldn't find a website at that address."
@@ -169,6 +183,21 @@ struct ContentView: View {
                 }
             }
         }
+    }
+}
+
+extension Image {
+    init?(data: Data) {
+#if os(macOS)
+        if let image = NSImage(data: data) {
+            self.init(nsImage: image)
+        }
+#else
+        if let image = UIImage(data: data) {
+            self.init(uiImage: image)
+        }
+#endif
+        return nil
     }
 }
 
